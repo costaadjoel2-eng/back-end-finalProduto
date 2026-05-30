@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>STP Produtos Locais</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================
+   BASE
+========================= */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#0b1220;
+color:#e5e7eb;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+position:fixed;
+left:0;
+top:0;
+width:260px;
+height:100vh;
+background:#0f172a;
+padding:25px;
+border-right:1px solid #1f2937;
+}
+
+.logo{
+font-size:22px;
+font-weight:700;
+color:white;
+margin-bottom:40px;
+}
+
+.logo span{color:#38bdf8;}
+
+.menu button{
+width:100%;
+padding:14px;
+margin-bottom:12px;
+border:none;
+border-radius:12px;
+background:#1e293b;
+color:white;
+cursor:pointer;
+transition:0.3s;
+text-align:left;
+}
+
+.menu button:hover{
+background:#2563eb;
+transform:translateX(5px);
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+margin-left:260px;
+padding:30px;
+}
+
+.topbar h1{
+font-size:28px;
+margin-bottom:10px;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:15px;
+margin-bottom:20px;
+}
+
+.card{
+background:#111827;
+padding:18px;
+border-radius:14px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+cursor:pointer;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.number{
+font-size:26px;
+font-weight:bold;
+color:#38bdf8;
+}
+
+/* =========================
+   BOX
+========================= */
+
+.box{
+display:none;
+background:#111827;
+padding:20px;
+border-radius:14px;
+margin-top:15px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:6px 0;
+border-radius:10px;
+border:1px solid #1f2937;
+background:#0b1220;
+color:white;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+}
+
+.green{background:#22c55e;color:white;}
+.blue{background:#2563eb;color:white;}
+.red{background:#ef4444;color:white;}
+
+/* =========================
+   LISTA
+========================= */
+
+.list{
+margin-top:15px;
+}
+
+.item{
+background:#111827;
+padding:12px;
+margin:8px 0;
+border-radius:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+transition:0.3s;
+}
+
+.item:hover{
+transform:scale(1.01);
+}
+
+/* =========================
+   CARD PESQUISA
+========================= */
+
+.card-detail{
+background:#111827;
+padding:15px;
+border-radius:12px;
+margin-top:10px;
+}
+
+.notfound{
+text-align:center;
+padding:15px;
+color:#9ca3af;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+display:none;
+justify-content:center;
+align-items:center;
+}
+
+.modal-box{
+background:#111827;
+padding:20px;
+border-radius:12px;
+width:380px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">STP <span>Produtos</span></div>
+
+<div class="menu">
+<button onclick="showAdd()">➕ Adicionar</button>
+<button onclick="showList()">📦 Listar</button>
+<button onclick="showSearch()">🔎 Pesquisar</button>
+</div>
+
+</div>
+
+<div class="main">
+
+<div class="topbar">
+<h1>Dashboard de Produtos</h1>
+</div>
+
+<div class="stats">
+
+<div class="card" onclick="showTotal()">
+<div>Total de Produtos</div>
+<div class="number" id="total">0</div>
+</div>
+
+<div class="card">
+<div>Status Sistema</div>
+<div class="number">Online</div>
+</div>
+
+<div class="card">
+<div>Região</div>
+<div class="number">STP</div>
+</div>
+
+</div>
+
+<div class="box" id="addBox">
+<h3>Adicionar Produto</h3>
+<input id="nome" placeholder="Nome">
+<input id="descricao" placeholder="Descrição">
+<input id="preco" placeholder="Preço">
+<input id="categoria" placeholder="Categoria">
+<input id="regiao" placeholder="Região">
+<button class="btn green" onclick="addProduct()">Guardar</button>
+</div>
+
+<div class="box" id="searchBox">
+<h3>Pesquisar Produto</h3>
+<input id="search" placeholder="Nome do produto">
+<button class="btn blue" onclick="searchProducts()">Buscar</button>
+<div id="result"></div>
+</div>
+
+<div class="list" id="list"></div>
+
+</div>
+
+<div class="modal" id="modal">
+<div class="modal-box">
+
+<h3>Editar Produto</h3>
+
+<input type="hidden" id="editId">
+<input id="editNome">
+<input id="editDescricao">
+<input id="editPreco">
+<input id="editCategoria">
+<input id="editRegiao">
+
+<button class="btn blue" onclick="updateProduct()">Guardar</button>
+<button class="btn red" onclick="closeModal()">Fechar</button>
+
+</div>
+</div>
+
+<script>
+
+const API="http://localhost:3000/produtos";
+const API_KEY="123456";
+
+/* ELEMENTOS */
+const addBox=document.getElementById("addBox");
+const searchBox=document.getElementById("searchBox");
+const list=document.getElementById("list");
+const result=document.getElementById("result");
+
+/* UI */
+function clearUI(){
+addBox.style.display="none";
+searchBox.style.display="none";
+list.innerHTML="";
+result.innerHTML="";
+}
+
+function showAdd(){clearUI();addBox.style.display="block";}
+function showSearch(){clearUI();searchBox.style.display="block";}
+
+/* TOTAL */
+function showTotal(){
+fetch(API+"/listar",{headers:{"x-api-key":API_KEY}})
+.then(r=>r.json())
+.then(d=>{
+document.getElementById("total").innerText=d.length;
+});
+}
+
+/* LISTAR */
+function showList(){
+clearUI();
+
+fetch(API+"/listar",{headers:{"x-api-key":API_KEY}})
+.then(r=>r.json())
+.then(data=>{
+
+document.getElementById("total").innerText=data.length;
+
+let html="";
+
+data.forEach(p=>{
+html+=`
+<div class="item">
+<span>${p.nome}</span>
+<div>
+<button class="blue" onclick='openEdit(${JSON.stringify(p)})'>Editar</button>
+<button class="red" onclick='deleteProduct(${p.id})'>Eliminar</button>
+</div>
+</div>`;
+});
+
+list.innerHTML=html;
+});
+}
+
+/* SEARCH */
+function searchProducts(){
+let s=search.value;
+
+fetch(API+"/listar?search="+s,{headers:{"x-api-key":API_KEY}})
+.then(r=>r.json())
+.then(data=>{
+
+if(data.length===0){
+result.innerHTML=`<div class="notfound">Produto não encontrado</div>`;
+return;
+}
+
+let p=data[0];
+
+result.innerHTML=`
+<div class="card-detail">
+<h3>${p.nome}</h3>
+<p>${p.descricao}</p>
+<p>${p.categoria} | ${p.regiao}</p>
+<p><b>${p.preco} €</b></p>
+</div>`;
+});
+}
+
+/* ADD */
+function addProduct(){
+fetch(API+"/criar",{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"x-api-key":API_KEY
+},
+body:JSON.stringify({
+nome:nome.value,
+descricao:descricao.value,
+preco:preco.value,
+categoria:categoria.value,
+regiao:regiao.value
+})
+}).then(()=>showList());
+}
+
+/* DELETE */
+function deleteProduct(id){
+fetch(API+"/delete/"+id,{
+method:"DELETE",
+headers:{"x-api-key":API_KEY}
+}).then(()=>showList());
+}
+
+/* EDIT */
+function openEdit(p){
+modal.style.display="flex";
+editId.value=p.id;
+editNome.value=p.nome;
+editDescricao.value=p.descricao;
+editPreco.value=p.preco;
+editCategoria.value=p.categoria;
+editRegiao.value=p.regiao;
+}
+
+/* UPDATE */
+function updateProduct(){
+fetch(API+"/update/"+editId.value,{
+method:"PUT",
+headers:{
+"Content-Type":"application/json",
+"x-api-key":API_KEY
+},
+body:JSON.stringify({
+nome:editNome.value,
+descricao:editDescricao.value,
+preco:editPreco.value,
+categoria:editCategoria.value,
+regiao:editRegiao.value
+})
+}).then(()=>{
+closeModal();
+showList();
+});
+}
+
+function closeModal(){
+modal.style.display="none";
+}
+
+showList();
+
+</script>
+
+</body>
+</html>
